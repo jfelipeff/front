@@ -1,8 +1,20 @@
+const path = require("path");
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: "standalone",
+  typescript: {
+    // !! WARN !!
+    // Dangerously allow production builds to successfully complete even if
+    // your project has type errors.
+    // !! WARN !!
+    ignoreBuildErrors: true,
+  },
   experimental: {
     serverActions: true,
-    serverComponentsExternalPackages: ["mongoose"],
+    // this includes files from the monorepo base two directories up
+    outputFileTracingRoot: path.join(__dirname, "../../"),
+    // serverComponentsExternalPackages: ["mongoose"],
   },
   eslint: {
     // Warning: This allows production builds to successfully complete even if

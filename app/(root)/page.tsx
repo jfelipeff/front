@@ -1,58 +1,90 @@
-import { currentUser } from "@clerk/nextjs";
-import { redirect } from "next/navigation";
+"use client";
 
-import QueryCard from "@/components/cards/QueryCard";
-import Pagination from "@/components/shared/Pagination";
+import QueryForm from "@/components/forms/QueryForm";
+import LeftSidebar from "@/components/LeftSidebar";
+import RightSidebar from "@/components/RightSidebar";
+import { useEffect, useRef, useState } from "react";
+import useQuery, { QueryCreate } from "@/lib/hooks/useQuery";
+import CommentsSection from "@/components/CommentsSection";
 
-import { fetchPosts } from "@/lib/actions/query.actions";
-import { fetchUser } from "@/lib/actions/user.actions";
+const Home = () => {
+  const [username, setUsername] = useState(null);
+  const {
+    getCommentsForQuery,
+    currentComments,
+    addCommentToQuery,
+    allQueries,
+    getAllQueries,
+    myQueries,
+    getMyQueries,
+    loadingAllQueries,
+    loadingMyQueries,
+  } = useQuery();
+  const [isQueryDisplayed, setIsQueryDisplayed] = useState(false);
+  const [currentQueryId, setCurrentQueryId] = useState(null);
 
-async function Home({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | undefined };
-}) {
-  const user = await currentUser();
-  if (!user) return null;
+  const onTapOldQuery = async (query: QueryCreate, isMyQuery: boolean) => {
+    queryFormRef.current?.runOldQuery(query, isMyQuery);
+    await getCommentsForQuery(query.id);
+  };
 
-  const result = await fetchPosts(
-    searchParams.page ? +searchParams.page : 1,
-    30
-  );
+  const queryFormRef = useRef();
+
+  useEffect(() => {
+    const username = JSON.parse(localStorage.getItem(userNameLocalStorageKeyz));
+    if (username) {
+      setUsername(username);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(userNameLocalStorageKey, JSON.stringify(username));
+    getAllQueries(username);
+    getMyQueries(username);
+  }, [username]);
 
   return (
-    <>
-      <h1 className='head-text text-left'>Home</h1>
-
-      <section className='mt-9 flex flex-col gap-10'>
-        {result.posts.length === 0 ? (
-          <p className='no-result'>No threads found</p>
-        ) : (
-          <>
-            {result.posts.map((post) => (
-              <QueryCard
-                key={post._id}
-                id={post._id}
-                currentUserId={user.id}
-                parentId={post.parentId}
-                content={post.text}
-                author={post.author}
-                community={post.community}
-                createdAt={post.createdAt}
-                comments={post.children}
-              />
-            ))}
-          </>
-        )}
-      </section>
-
-      <Pagination
-        path='/'
-        pageNumber={searchParams?.page ? +searchParams.page : 1}
-        isNext={result.isNext}
+    <main className="flex flex-row justify-center">
+      <LeftSidebar
+        onTapOldQuery={onTapOldQuery}
+        myQueries={myQueries}
+        loadingMyQueries={loadingMyQueries}
       />
-    </>
+      <div className="flex flex-col w-full p-8">
+        <h1 className="flex-col head-text text-left">Home</h1>
+        {username && (
+          <h1 className="flex-col head-text text-left">
+            {`Welcome! @${username}`}
+          </h1>
+        )}
+        <QueryForm
+          ref={queryFormRef}
+          username={username}
+          setUsername={setUsername}
+          setIsQueryDisplayed={setIsQueryDisplayed}
+          setCurrentQueryId={setCurrentQueryId}
+          getAllQueries={getAllQueries}
+        />
+        {isQueryDisplayed && (
+          <div className="flex flex-row justify-between py-4">
+            <CommentsSection
+              comments={currentComments}
+              queryId={currentQueryId}
+              username={username}
+              setUsername={setUsername}
+              addCommentToQuery={addCommentToQuery}
+              getCommentsForQuery={getCommentsForQuery}
+            />
+          </div>
+        )}
+      </div>
+      <RightSidebar
+        onTapOldQuery={onTapOldQuery}
+        allQueries={allQueries}
+        loadingAllQueries={loadingAllQueries}
+      />
+    </main>
   );
-}
+};
 
 export default Home;

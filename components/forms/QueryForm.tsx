@@ -14,8 +14,12 @@ import React, { forwardRef, useImperativeHandle, useState } from "react";
 import useIndicators from "@/lib/hooks/useIndicators";
 import useQuery, { QueryCreate, QueryResult } from "@/lib/hooks/useQuery";
 import Loading from "../Loading";
+import { yearsRange } from "@/lib/utils";
 
+// Form where the user can select the parameters to build a query
 const QueryForm = forwardRef((props, ref) => {
+  // This is used for the parent component to be able to call the runOldQuery function
+  // when a community query is tapped
   useImperativeHandle(
     ref,
     () => ({
@@ -34,12 +38,7 @@ const QueryForm = forwardRef((props, ref) => {
 
   const { countries, isCountryListLoading } = useCountries();
   const { indicators, isIndicatorsListLoading } = useIndicators();
-  const years = Array.from({ length: 2023 - 1980 }, (v, k) => k + 1980).map(
-    (x) => ({
-      value: x,
-      label: x,
-    })
-  );
+  const years = yearsRange();
   const { createQuery, isQueryLoading } = useQuery();
   const [hideVisualBuilder, setHideVisualBuilder] = useState<boolean>(false);
   const [queryResult, setQueryResult] = useState<QueryResult[]>([]);

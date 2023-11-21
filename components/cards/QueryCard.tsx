@@ -6,6 +6,8 @@ interface Props {
   onTapOldQuery: (query: QueryCreate) => void;
 }
 
+// Displays a query card in the sidebars
+// The function onTapOldQuery manages the callback when the card is tapped
 const QueryCard = ({ query, onTapOldQuery }: Props) => {
   return (
     <article className="community-card">

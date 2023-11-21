@@ -38,6 +38,9 @@ export default function useQuery() {
   const [loadingMyQueries, setLoadingMyQueries] = useState<boolean>([]);
   const [currentComments, setCurrentComments] = useState<Comment[]>([]);
 
+  // Creates a query with a queryCreate object that
+  // contains the indicator code, year, country_code,
+  // username, name and description
   const createQuery = async (queryCreate: QueryCreate, save: boolean) => {
     try {
       setIsQueryLoading(true);
@@ -71,6 +74,9 @@ export default function useQuery() {
     }
   };
 
+  // Gets all queries
+  // TODO: Use current username to get the queries that
+  // doesn't belong to the current user
   const getAllQueries = async (currentUsername?: string) => {
     try {
       setLoadingAllQueries(true);
@@ -85,6 +91,9 @@ export default function useQuery() {
     }
   };
 
+  // Gets my queries to have them in left side bar
+  // TODO Use current username to get the queries that
+  // DO belong to the current user
   const getMyQueries = async (username: string) => {
     try {
       setLoadingMyQueries(true);
@@ -97,7 +106,7 @@ export default function useQuery() {
           country_code: "PER",
           countryName: "PERu",
           indicator_code: "UIS.R.1",
-          indicatorName: "blablablaba",
+          indicatorName: "Porcentaje",
           year: 2006,
           value: 24,
         },
@@ -109,7 +118,7 @@ export default function useQuery() {
           country_code: "PER",
           countryName: "PERu",
           indicator_code: "UIS.R.1",
-          indicatorName: "blablablaba",
+          indicatorName: "Porcentaje",
           year: 2000,
           value: 24,
         },
@@ -123,6 +132,7 @@ export default function useQuery() {
     }
   };
 
+  // Gets comments for a query based on queryId
   const getCommentsForQuery = async (queryId: string) => {
     try {
       setLoading(true);
@@ -139,6 +149,8 @@ export default function useQuery() {
     }
   };
 
+  // Adds a comment to a query based on queryId.
+  // The username is the owner of the comment
   const addCommentToQuery = async (
     queryId: string,
     username: string,

@@ -6,6 +6,7 @@ import RightSidebar from "@/components/RightSidebar";
 import { useEffect, useRef, useState } from "react";
 import useQuery, { QueryCreate } from "@/lib/hooks/useQuery";
 import CommentsSection from "@/components/CommentsSection";
+import { userNameLocalStorageKey } from "@/lib/constants";
 
 const Home = () => {
   const [username, setUsername] = useState(null);
@@ -20,24 +21,34 @@ const Home = () => {
     loadingAllQueries,
     loadingMyQueries,
   } = useQuery();
+
+  // Used to know if the comments section should be displayed
   const [isQueryDisplayed, setIsQueryDisplayed] = useState(false);
+
+  // Used to know which query is being displayed
   const [currentQueryId, setCurrentQueryId] = useState(null);
 
+  // Used to pass as callback to sidebars for when a community card is tapped
   const onTapOldQuery = async (query: QueryCreate, isMyQuery: boolean) => {
+    // Performs the query withing the query form
     queryFormRef.current?.runOldQuery(query, isMyQuery);
+    // When the query is displayed, the comments section should be displayed
     await getCommentsForQuery(query.id);
   };
 
+  // Used to pass as ref to the query form
   const queryFormRef = useRef();
 
   useEffect(() => {
-    const username = JSON.parse(localStorage.getItem(userNameLocalStorageKeyz));
+    // If the username is stored in local storage, set it
+    const username = JSON.parse(localStorage.getItem(userNameLocalStorageKey));
     if (username) {
       setUsername(username);
     }
   }, []);
 
   useEffect(() => {
+    // If the username was set (for example when creating a query), store it in local storage and get all queries
     localStorage.setItem(userNameLocalStorageKey, JSON.stringify(username));
     getAllQueries(username);
     getMyQueries(username);

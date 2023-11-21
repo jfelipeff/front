@@ -1,1 +1,1 @@
-const userNameLocalStorageKey = "username";
+export const userNameLocalStorageKey = "username";
